@@ -39,15 +39,31 @@
   const getNextLink = () => document.querySelector('a[data-for^="next-project-name"]');
   const getModalScroller = () => getModal()?.querySelector('.overflow-y-scroll');
 
-  const extractFromModal = () => {
+  const findDevLink = () => {
+    const modal = getModal(); if (!modal) return null;
+    const isProfileHref = a => {
+      const h = a.getAttribute('href') || '';
+      return h.startsWith('/') && !h.includes('/project/') && !h.includes('/launchpad') && h !== '/';
+    };
+    // Primary: a[type="button"] with a profile href.
+    let link = [...modal.querySelectorAll('a[type="button"][href^="/"]')].find(a =>
+      isProfileHref(a) && !!a.querySelector('p')
+    );
+    if (link) return link;
+    // Fallback: the creator block sits in a `.min-h-6` container near the header.
+    for (const a of modal.querySelectorAll('.min-h-6 a[href^="/"]')) {
+      if (isProfileHref(a)) return a;
+    }
+    return null;
+  };
+
+  // Async because the developer block sometimes mounts a beat after the h1
+  // when navigating between popups.
+  const extractFromModal = async () => {
     const modal = getModal(); if (!modal) return null;
     const h1 = modal.querySelector('h1');
     const productName = h1 ? h1.textContent.trim() : '';
-    const link = [...modal.querySelectorAll('a[type="button"][href^="/"]')].find(a => {
-      const href = a.getAttribute('href') || '';
-      if (href.includes('/project/') || href.includes('/launchpad') || href === '/') return false;
-      return !!a.querySelector('p');
-    });
+    const link = await waitFor(findDevLink, 3000);
     let devName = '', devUrl = '';
     if (link) {
       const p = link.querySelector('p.font-semibold') || link.querySelector('p');
@@ -57,7 +73,7 @@
     return { productName, devName, devUrl };
   };
 
-  // Periodically scroll the popup content so it looks like a human is reading.
+  // While waiting, scroll the popup like a human is reading.
   const humanScroll = async durationMs => {
     const t0 = Date.now();
     while (Date.now() - t0 < durationMs) {
@@ -87,7 +103,7 @@
     if (window.__stopUpvote) { console.log('Stopped by user.'); break; }
     i++;
 
-    const info = extractFromModal();
+    const info = await extractFromModal();
     if (!info?.productName) {
       console.warn(`#${i}: couldn't read product info`);
     } else {
