@@ -36,6 +36,10 @@
     const el = btn.querySelector('number-flow-react');
     return el ? parseInt(el.getAttribute('aria-label'), 10) : NaN;
   };
+  const isAlreadyUpvoted = () => {
+    const btn = getUpvoteBtn(); if (!btn) return false;
+    return /\bUpvoted\b/.test(btn.textContent || '');
+  };
   const getNextLink = () => document.querySelector('a[data-for^="next-project-name"]');
   const getModalScroller = () => getModal()?.querySelector('.overflow-y-scroll');
 
@@ -110,37 +114,44 @@
       console.log(`[#${i}] ${info.productName} — by ${info.devName || '?'}`);
     }
 
-    const before = getUpvoteCount();
     const btn = getUpvoteBtn();
     if (!btn) {
       console.warn(`  no upvote button found, stopping`);
       break;
     }
-    btn.click();
-    await sleep(1000);
-    const after = getUpvoteCount();
 
-    if (Number.isFinite(before) && Number.isFinite(after) && after === before + 1) {
-      upvoted.push({
-        index: i,
-        product: info?.productName || '',
-        developer_name: info?.devName || '',
-        developer_url: info?.devUrl || '',
-        upvotes_before: before,
-        upvotes_after: after,
-      });
-      console.log(`  ✔ upvoted (${before} → ${after})`);
-    } else if (Number.isFinite(before) && Number.isFinite(after) && after === before - 1) {
-      console.log(`  ↶ already upvoted, restoring`);
-      btn.click();
-      await sleep(700);
+    await sleep(2000);
+
+    let skipWait = false;
+    if (isAlreadyUpvoted()) {
+      console.log(`  ⏭ already upvoted, skipping straight to next`);
+      skipWait = true;
     } else {
-      console.warn(`  ✗ no count change (${before} → ${after})`);
+      const before = getUpvoteCount();
+      btn.click();
+      await sleep(1000);
+      const after = getUpvoteCount();
+
+      if (Number.isFinite(before) && Number.isFinite(after) && after === before + 1) {
+        upvoted.push({
+          index: i,
+          product: info?.productName || '',
+          developer_name: info?.devName || '',
+          developer_url: info?.devUrl || '',
+          upvotes_before: before,
+          upvotes_after: after,
+        });
+        console.log(`  ✔ upvoted (${before} → ${after})`);
+      } else {
+        console.warn(`  ✗ no count change (${before} → ${after})`);
+      }
     }
 
-    const wait = rand(1000, 30000);
-    console.log(`  waiting ${(wait / 1000).toFixed(1)}s before next`);
-    await humanScroll(wait);
+    if (!skipWait) {
+      const wait = rand(1000, 30000);
+      console.log(`  waiting ${(wait / 1000).toFixed(1)}s before next`);
+      await humanScroll(wait);
+    }
     if (window.__stopUpvote) { console.log('Stopped.'); break; }
 
     const next = getNextLink();
