@@ -8,6 +8,7 @@
   let statusText = 'Ready.'
   let likeTimer = null
   let likedCount = 0
+  let startTime = 0
   const processedPosts = new WeakSet()
   const likeQueue = []
   let KEYWORDS = []
@@ -20,6 +21,13 @@
     } catch (e) {
       console.error('[ProfileBuilder/LinkedIn] Failed to load keywords:', e)
     }
+  }
+
+  function elapsed() {
+    const secs = Math.floor((Date.now() - startTime) / 1000)
+    const m = Math.floor(secs / 60)
+    const s = secs % 60
+    return m > 0 ? `${m}m ${s}s` : `${s}s`
   }
 
   function notify(text, isRunning = running) {
@@ -107,7 +115,7 @@
         document.scrollingElement
       if (feed) feed.scrollBy({ top: 800, behavior: 'smooth' })
       else window.scrollBy({ top: 800, behavior: 'smooth' })
-      notify(`Liked ${likedCount}. Scrolling for more posts…`)
+      notify(`Liked ${likedCount} in ${elapsed()}. Scrolling for more…`)
       likeTimer = setTimeout(processNext, LIKE_INTERVAL_MS)
       return
     }
@@ -133,11 +141,11 @@
         btn.click()
         likedCount++
         const preview = headline.length > 50 ? headline.slice(0, 50) + '…' : headline
-        notify(`Liked ${likedCount} — "${preview}"`)
+        notify(`Liked ${likedCount} in ${elapsed()} — "${preview}"`)
       } catch (e) {
         console.error('[ProfileBuilder/LinkedIn] Click error:', e)
       }
-      // 10 s gap starts AFTER the click
+      // 15s gap starts AFTER the click
       likeTimer = setTimeout(processNext, LIKE_INTERVAL_MS)
     }, 600)
   }
@@ -147,6 +155,7 @@
     if (KEYWORDS.length === 0) return { error: 'Keywords not loaded. Reload the page and try again.' }
     running = true
     likedCount = 0
+    startTime = Date.now()
     likeQueue.length = 0
     notify('Starting…', true)
     likeTimer = setTimeout(processNext, 300)
@@ -156,7 +165,7 @@
   function stop() {
     running = false
     clearTimeout(likeTimer)
-    notify(`Stopped. Liked ${likedCount} posts this session.`, false)
+    notify(`Stopped after ${elapsed()}. Liked ${likedCount} posts.`, false)
     return { ok: true }
   }
 
