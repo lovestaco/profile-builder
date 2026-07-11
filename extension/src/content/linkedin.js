@@ -120,12 +120,13 @@
       return
     }
 
-    // Scroll the button into view, then wait for the scroll to settle before clicking
+    // Scroll into view, wait for scroll to settle, then click.
+    // Both timers must go through likeTimer so stop() can always cancel the chain.
     btn.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    setTimeout(() => {
+    likeTimer = setTimeout(() => {
       if (!running) return
       if (!document.contains(btn) || isAlreadyLiked(btn)) {
-        likeTimer = setTimeout(processNext, 500)
+        likeTimer = setTimeout(processNext, 1000)
         return
       }
       try {
@@ -136,6 +137,7 @@
       } catch (e) {
         console.error('[ProfileBuilder/LinkedIn] Click error:', e)
       }
+      // 10 s gap starts AFTER the click
       likeTimer = setTimeout(processNext, LIKE_INTERVAL_MS)
     }, 600)
   }
