@@ -101,7 +101,12 @@
     collectPosts()
 
     if (likeQueue.length === 0) {
-      window.scrollBy({ top: 800, behavior: 'smooth' })
+      // LinkedIn's search page scrolls an inner container, not window
+      const feed = document.getElementById('workspace') ||
+        document.querySelector('main[id]') ||
+        document.scrollingElement
+      if (feed) feed.scrollBy({ top: 800, behavior: 'smooth' })
+      else window.scrollBy({ top: 800, behavior: 'smooth' })
       notify(`Liked ${likedCount}. Scrolling for more posts…`)
       likeTimer = setTimeout(processNext, LIKE_INTERVAL_MS)
       return
