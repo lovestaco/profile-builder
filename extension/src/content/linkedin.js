@@ -172,7 +172,7 @@
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.type === 'START') sendResponse(start())
     else if (msg.type === 'STOP') sendResponse(stop())
-    else if (msg.type === 'GET_STATE') sendResponse({ running, statusText })
+    else if (msg.type === 'GET_STATE') sendResponse({ running, statusText, startTime })
     return true
   })
 

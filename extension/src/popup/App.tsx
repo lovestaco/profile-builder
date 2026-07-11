@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { PLATFORMS } from './platforms'
 
 type StatusKind = '' | 'running' | 'error'
@@ -14,6 +14,17 @@ export default function App() {
   const [tabUrl, setTabUrl] = useState('')
   const [running, setRunning] = useState(false)
   const [status, setStatus] = useState<Status>({ text: '', kind: '' })
+  const [elapsedSecs, setElapsedSecs] = useState(0)
+  const sessionStart = useRef(0)
+
+  function fmtElapsed(secs: number) {
+    const h = Math.floor(secs / 3600)
+    const m = Math.floor((secs % 3600) / 60)
+    const s = secs % 60
+    if (h > 0) return `${h}h ${m}m ${s}s`
+    if (m > 0) return `${m}m ${s}s`
+    return `${s}s`
+  }
 
   const platform = PLATFORMS[platformKey]
   const cap = platform?.capability
@@ -33,6 +44,7 @@ export default function App() {
       if (state?.running) {
         setRunning(true)
         setStatus({ text: state.statusText || 'Running…', kind: 'running' })
+        if (state.startTime) sessionStart.current = state.startTime
       } else {
         setRunning(false)
         setStatus({ text: state?.statusText || 'Ready.', kind: '' })
@@ -42,6 +54,15 @@ export default function App() {
       setStatus({ text: "Reload the tab if buttons don't respond.", kind: 'error' })
     }
   }, [send])
+
+  // Live elapsed timer — ticks every second while running
+  useEffect(() => {
+    if (!running) { setElapsedSecs(0); return }
+    const tick = () => setElapsedSecs(Math.floor((Date.now() - sessionStart.current) / 1000))
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [running])
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
@@ -77,6 +98,7 @@ export default function App() {
   }
 
   const handleStart = async () => {
+    sessionStart.current = Date.now()
     setRunning(true)
     setStatus({ text: 'Starting…', kind: 'running' })
     try {
@@ -146,6 +168,9 @@ export default function App() {
               </div>
               {status.text && (
                 <div className={['status', status.kind].filter(Boolean).join(' ')}>{status.text}</div>
+              )}
+              {running && (
+                <div className="elapsed">⏱ {fmtElapsed(elapsedSecs)}</div>
               )}
             </>
           )}

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Profile Builder",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Automate launch-platform actions. Peerlist: auto-upvote launches and export results as CSV.",
   "permissions": [
     "activeTab",
