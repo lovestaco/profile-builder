@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" == */profile-builder/extension/src/* ]]; then cd /home/lovestaco/pers/profile-builder/extension && make release 2>&1; fi",
+            "timeout": 60,
+            "statusMessage": "Bumping version and rebuilding extension…"
+          }
+        ]
+      }
+    ]
+  }
+}

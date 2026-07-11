@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Skill(update-config)",
+      "Bash(bash -c 'FILE=$\\(jq -r \".tool_input.file_path // \\\\\"\\\\\"\"\\); if [[ \"$FILE\" == */profile-builder/extension/src/* ]]; then make release 2>&1; fi')",
+      "Bash(echo \"exit: $?\")",
+      "Bash(git -C /home/lovestaco/pers/profile-builder status)",
+      "Bash(git -C /home/lovestaco/pers/profile-builder log --oneline -3)",
+      "Bash(git -C /home/lovestaco/pers/profile-builder add .claude/ extension/.gitignore extension/Makefile extension/package-lock.json extension/package.json extension/src/ extension/tsconfig.json extension/vite.config.ts extension/manifest.json)",
+      "Bash(git -C /home/lovestaco/pers/profile-builder rm extension/content.js extension/popup.html extension/popup.js)",
+      "Bash(git -C /home/lovestaco/pers/profile-builder commit -m ' *)"
+    ]
+  }
+}

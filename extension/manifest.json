@@ -1,18 +1,30 @@
 {
   "manifest_version": 3,
   "name": "Profile Builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automate launch-platform actions. Peerlist: auto-upvote launches and export results as CSV.",
-  "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["https://peerlist.io/*"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://peerlist.io/*",
+    "https://www.linkedin.com/*",
+    "https://www.f6s.com/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Profile Builder"
   },
   "content_scripts": [
     {
-      "matches": ["https://peerlist.io/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://peerlist.io/*"
+      ],
+      "js": [
+        "content/peerlist.js"
+      ],
       "run_at": "document_idle"
     }
   ],
