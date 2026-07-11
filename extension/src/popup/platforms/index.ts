@@ -2,6 +2,7 @@ export interface Capability {
   title: string
   desc: string
   hint?: string
+  stopLabel?: string
   urlMatch: RegExp
   urlHint: string
 }
@@ -25,12 +26,13 @@ export const PLATFORMS: Record<string, Platform> = {
   },
   linkedin: {
     label: 'LinkedIn',
-    comingSoon: true,
     capability: {
-      title: 'Coming Soon',
-      desc: 'LinkedIn automation is under development.',
+      title: 'Auto Post Liker',
+      desc: 'Scans a LinkedIn content search page and likes posts from people whose headline matches your keyword list. Capped at 6 likes/min.',
+      hint: 'Tip: use a keyword-filtered content search, e.g. linkedin.com/search/results/content/?sortBy=date_posted',
+      stopLabel: 'Stop',
       urlMatch: /^https:\/\/www\.linkedin\.com\//,
-      urlHint: '',
+      urlHint: 'Open a LinkedIn page, then reopen this popup.',
     },
   },
   f6s: {

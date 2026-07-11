@@ -94,7 +94,7 @@ export default function App() {
   }
 
   const handleStop = async () => {
-    setStatus({ text: 'Stopping & exporting CSV…', kind: '' })
+    setStatus({ text: 'Stopping…', kind: '' })
     try {
       await send({ type: 'STOP' })
     } catch {
@@ -141,7 +141,7 @@ export default function App() {
                   Start
                 </button>
                 <button className="stop" disabled={!running} onClick={handleStop}>
-                  Stop &amp; Export CSV
+                  {cap.stopLabel ?? 'Stop & Export CSV'}
                 </button>
               </div>
               {status.text && (

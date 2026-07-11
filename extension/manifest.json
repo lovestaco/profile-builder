@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Profile Builder",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Automate launch-platform actions. Peerlist: auto-upvote launches and export results as CSV.",
   "permissions": [
     "activeTab",
@@ -26,6 +26,25 @@
         "content/peerlist.js"
       ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.linkedin.com/*"
+      ],
+      "js": [
+        "content/linkedin.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "config/linkedin-keywords.json"
+      ],
+      "matches": [
+        "https://www.linkedin.com/*"
+      ]
     }
   ],
   "icons": {

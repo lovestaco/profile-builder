@@ -26,6 +26,14 @@ function copyExtensionStatics() {
           copyFileSync(resolve(contentSrc, f), resolve(dist, 'content', f))
         }
       }
+
+      const configSrc = resolve(root, 'src', 'config')
+      if (existsSync(configSrc)) {
+        mkdirSync(resolve(dist, 'config'), { recursive: true })
+        for (const f of readdirSync(configSrc)) {
+          copyFileSync(resolve(configSrc, f), resolve(dist, 'config', f))
+        }
+      }
     },
   }
 }
