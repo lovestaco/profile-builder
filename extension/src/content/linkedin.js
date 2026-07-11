@@ -120,16 +120,24 @@
       return
     }
 
-    try {
-      btn.click()
-      likedCount++
-      const preview = headline.length > 50 ? headline.slice(0, 50) + '…' : headline
-      notify(`Liked ${likedCount} — "${preview}"`)
-    } catch (e) {
-      console.error('[ProfileBuilder/LinkedIn] Click error:', e)
-    }
-
-    likeTimer = setTimeout(processNext, LIKE_INTERVAL_MS)
+    // Scroll the button into view, then wait for the scroll to settle before clicking
+    btn.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    setTimeout(() => {
+      if (!running) return
+      if (!document.contains(btn) || isAlreadyLiked(btn)) {
+        likeTimer = setTimeout(processNext, 500)
+        return
+      }
+      try {
+        btn.click()
+        likedCount++
+        const preview = headline.length > 50 ? headline.slice(0, 50) + '…' : headline
+        notify(`Liked ${likedCount} — "${preview}"`)
+      } catch (e) {
+        console.error('[ProfileBuilder/LinkedIn] Click error:', e)
+      }
+      likeTimer = setTimeout(processNext, LIKE_INTERVAL_MS)
+    }, 600)
   }
 
   function start() {
